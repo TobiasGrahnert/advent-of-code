@@ -1,8 +1,11 @@
+import java.security.InvalidParameterException
+
 enum class Direction {
     NORTH,
     SOUTH,
     WEST,
-    EAST
+    EAST,
+    NONE
 }
 fun main() {
 
@@ -12,6 +15,18 @@ fun main() {
             Direction.SOUTH -> Pair(this.first+1, this.second)
             Direction.WEST -> Pair(this.first, this.second-1)
             Direction.EAST -> Pair(this.first, this.second+1)
+            Direction.NONE -> this
+        }
+    }
+
+    fun Pair<Int,Int>.getDirectionTo(location: Pair<Int,Int>): Direction {
+        if (this.first != location.first && this.second != location.second) throw InvalidParameterException()
+        return when {
+            this.first == location.first && this.second < location.second -> return Direction.EAST
+            this.first == location.first && this.second > location.second -> return Direction.WEST
+            this.second == location.second && this.first < location.first -> return Direction.SOUTH
+            this.second == location.second && this.first > location.first -> return Direction.NORTH
+            else -> Direction.NONE
         }
     }
 
@@ -67,11 +82,11 @@ fun main() {
     }
 
     fun left(
-        loopSet: HashSet<Pair<Int, Int>>,
+        loop: List<Pair<Int, Int>>,
         currentTile: Pair<Int, Int>,
         input: List<List<Char>>
     ): List<Pair<Int, Int>> {
-        val rowTiles = loopSet.filter { it.first == currentTile.first && it.second < currentTile.second }
+        val rowTiles = loop.filter { it.first == currentTile.first && it.second < currentTile.second }
         if (rowTiles.isEmpty()) return emptyList()
         val nextTile = rowTiles.maxWith(compareBy { it.second })
         return input[currentTile.first].withIndex()
@@ -80,11 +95,11 @@ fun main() {
     }
 
     fun right(
-        loopSet: HashSet<Pair<Int, Int>>,
+        loop: List<Pair<Int, Int>>,
         currentTile: Pair<Int, Int>,
         input: List<List<Char>>
     ): List<Pair<Int, Int>> {
-        val rowTiles = loopSet.filter { it.first == currentTile.first && it.second > currentTile.second }
+        val rowTiles = loop.filter { it.first == currentTile.first && it.second > currentTile.second }
         if (rowTiles.isEmpty()) return emptyList()
         val nextTile = rowTiles.minWith(compareBy { it.second })
         return input[currentTile.first].withIndex()
@@ -104,38 +119,47 @@ fun main() {
         }
 
         val loop = getLoop(start!!, input)
-        val loopSet = loop.toHashSet()
 
-        val newStart = loop.minWith(compareBy<Pair<Int, Int>> { it.first }.thenBy { it.second })
-        val startIndex = loop.indexOf(newStart)
+        val (startIndex, newStart) = loop.withIndex().minWith(compareBy<IndexedValue<Pair<Int, Int>>> { it.value.first }.thenBy { it.value.second })
         val counterClockwise = loop[startIndex+1].first > newStart.first || loop[startIndex+1].second < newStart.second
-        val enclosedTiles = mutableSetOf<Pair<Int,Int>>()
-        for (i in loop.indices) {
-            val idx = (i+startIndex)%loop.size
+        val enclosedTiles = loop.indices.asSequence().flatMap {
+            val idx = (it+startIndex)%loop.size
             val currentTile = loop[idx]
             val prevTile = loop[(idx + loop.size - 1) % loop.size]
-            val currentChar = input[currentTile.first][currentTile.second]
-            when (currentChar) {
-                'L' -> if (!counterClockwise && prevTile.first < currentTile.first
+            val adjacentTileDirections = setOf(currentTile.getDirectionTo(prevTile), currentTile.getDirectionTo(loop[(idx + loop.size + 1) % loop.size]))
+            when (adjacentTileDirections) {
+                setOf(Direction.NORTH, Direction.EAST) -> if (!counterClockwise && prevTile.first < currentTile.first
                     || counterClockwise && prevTile.second > currentTile.second)
-                    enclosedTiles.addAll(left(loopSet, currentTile, input))
-                '7' -> if (!counterClockwise && prevTile.first > currentTile.first
+                    left(loop, currentTile, input).asSequence()
+                else emptySequence()
+
+                setOf(Direction.SOUTH, Direction.WEST) -> if (!counterClockwise && prevTile.first > currentTile.first
                     || counterClockwise && prevTile.second < currentTile.second)
-                    enclosedTiles.addAll(right(loopSet, currentTile, input))
-                'F' -> if (!counterClockwise && prevTile.second > currentTile.second
+                    right(loop, currentTile, input).asSequence()
+                else emptySequence()
+
+                setOf(Direction.SOUTH, Direction.EAST) -> if (!counterClockwise && prevTile.second > currentTile.second
                     || counterClockwise && prevTile.first > currentTile.first)
-                    enclosedTiles.addAll(left(loopSet, currentTile, input))
-                'J' -> if (!counterClockwise && prevTile.second < currentTile.second
+                    left(loop, currentTile, input).asSequence()
+                else emptySequence()
+
+                setOf(Direction.NORTH, Direction.WEST) -> if (!counterClockwise && prevTile.second < currentTile.second
                     || counterClockwise && prevTile.first < currentTile.first)
-                    enclosedTiles.addAll(right(loopSet, currentTile, input))
-                '|' -> {
+                    right(loop, currentTile, input).asSequence()
+                else emptySequence()
+
+                setOf(Direction.NORTH, Direction.SOUTH) -> {
                     if (!counterClockwise == prevTile.first < currentTile.first)
-                        enclosedTiles.addAll(left(loopSet, currentTile, input))
+                        left(loop, currentTile, input).asSequence()
                     else if (!counterClockwise == prevTile.first > currentTile.first)
-                        enclosedTiles.addAll(right(loopSet, currentTile, input))
+                        right(loop, currentTile, input).asSequence()
+                    else emptySequence()
                 }
+
+                else -> emptySequence()
             }
-        }
+        }.toSet()
+
         return enclosedTiles.size
     }
 
