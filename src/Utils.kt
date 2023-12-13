@@ -47,6 +47,6 @@ fun calculateGCD(a: Int, b: Int): Int {
 fun <T>List<List<T>>.transpose(): List<List<T>> {
     return when {
         this.isEmpty() -> this
-        else -> (this[0].indices).map { i -> (this.indices).map { j -> this[j][i] } }
+        else -> this[0].indices.map { i -> this.indices.map { j -> this[j][i] } }
     }
 }
