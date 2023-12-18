@@ -1,5 +1,5 @@
-import java.security.InvalidParameterException
 import java.util.*
+import kotlin.math.abs
 
 fun main() {
     data class Instruction(val direction: Direction, val length: Long, val color: String) {
@@ -26,121 +26,57 @@ fun main() {
         }
     }
 
-    fun addNodes(nodes: MutableList<Pair<Long,Long>>, instruction: Instruction) {
-        val rowMod = when (instruction.direction) {
-            Direction.NORTH -> -1L
-            Direction.SOUTH -> 1L
-            else -> 0L
-        }
-        val colMod = when (instruction.direction) {
-            Direction.WEST -> -1L
-            Direction.EAST -> 1L
-            else -> 0L
-        }
-        for (i in 1..instruction.length) {
-            val sourceNode = nodes.first()
-            nodes.addFirst(Pair(sourceNode.first + rowMod, sourceNode.second + colMod))
-        }
-    }
-
-    fun Pair<Long,Long>.getDirectionTo(location: Pair<Long,Long>): Direction {
-        if (this.first != location.first && this.second != location.second) throw InvalidParameterException()
-        return when {
-            this.first == location.first && this.second < location.second -> return Direction.EAST
-            this.first == location.first && this.second > location.second -> return Direction.WEST
-            this.second == location.second && this.first < location.first -> return Direction.SOUTH
-            this.second == location.second && this.first > location.first -> return Direction.NORTH
-            else -> Direction.NONE
-        }
-    }
-
-    fun left(
-        loop: List<Pair<Long, Long>>,
-        currentTile: Pair<Long, Long>
-    ): Long {
-        val rowTiles = loop.filter { it.first == currentTile.first && it.second < currentTile.second }
-        if (rowTiles.isEmpty()) return 0L
-        val nextTile = rowTiles.maxWith(compareBy { it.second })
-        return ((nextTile.second + 1L ) ..< currentTile.second).fold(0L) { acc, _ -> acc.inc() }
-    }
-
-    fun right(
-        loop: List<Pair<Long, Long>>,
-        currentTile: Pair<Long, Long>
-    ): Long {
-        val rowTiles = loop.filter { it.first == currentTile.first && it.second > currentTile.second }
-        if (rowTiles.isEmpty()) return 0L
-        val nextTile = rowTiles.minWith(compareBy { it.second })
-        return ((currentTile.second + 1L) ..< nextTile.second).fold(0L) { acc, _ -> acc.inc() }
-    }
-
-    fun processInstructions(instructions: List<Instruction>): Long {
-        val nodes = mutableListOf(Pair(0L, 0L))
+    fun calculateEnclosedArea(instructions: List<Instruction>): Long {
+        val nodes = mutableListOf<Triple<Long, Long, Direction>>()
         for (inst in instructions) {
-            addNodes(nodes, inst)
+            val lastNode = nodes.lastOrNull() ?: Triple(0L, 0L, Direction.NONE)
+            when (inst.direction) {
+                Direction.NORTH -> nodes.addLast(Triple(lastNode.first + inst.length, lastNode.second, inst.direction))
+                Direction.SOUTH -> nodes.addLast(Triple(lastNode.first - inst.length, lastNode.second, inst.direction))
+                Direction.WEST -> nodes.addLast(Triple(lastNode.first, lastNode.second - inst.length, inst.direction))
+                Direction.EAST -> nodes.addLast(Triple(lastNode.first, lastNode.second + inst.length, inst.direction))
+                else -> continue
+            }
         }
-
-        nodes.removeFirst()
-        val (startIndex, newStart) = nodes.withIndex()
-            .minWith(compareBy<IndexedValue<Pair<Long, Long>>> { it.value.first }.thenBy { it.value.second })
+        val mostLeft = abs(nodes.minOf { it.second })
+        val mostDown = abs(nodes.minOf { it.first })
+        val offsetNodes = nodes.map { Triple(it.first + mostDown, it.second + mostLeft, it.third) }
+        val (startIndex, newStart) = offsetNodes.withIndex()
+            .minWith(compareBy<IndexedValue<Triple<Long, Long, Direction>>> { it.value.first }.thenBy { it.value.second })
         val counterClockwise =
-            nodes[(startIndex + 1) % nodes.size].first > newStart.first || nodes[(startIndex + 1) % nodes.size].second < newStart.second
-        val enclosedTiles = nodes.indices.asSequence().map {
-            val idx = (it + startIndex) % nodes.size
-            val currentTile = nodes[idx]
-            val prevTile = nodes[(idx + nodes.size - 1) % nodes.size]
-            val adjacentTileDirections = setOf(
-                currentTile.getDirectionTo(prevTile),
-                currentTile.getDirectionTo(nodes[(idx + nodes.size + 1) % nodes.size])
-            )
-            when (adjacentTileDirections) {
-                setOf(Direction.NORTH, Direction.EAST) -> if (!counterClockwise && prevTile.first < currentTile.first
-                    || counterClockwise && prevTile.second > currentTile.second
-                )
-                    left(nodes, currentTile)
-                else 0
-
-                setOf(Direction.SOUTH, Direction.WEST) -> if (!counterClockwise && prevTile.first > currentTile.first
-                    || counterClockwise && prevTile.second < currentTile.second
-                )
-                    right(nodes, currentTile)
-                else 0
-
-                setOf(Direction.SOUTH, Direction.EAST) -> if (!counterClockwise && prevTile.second > currentTile.second
-                    || counterClockwise && prevTile.first > currentTile.first
-                )
-                    left(nodes, currentTile)
-                else 0
-
-                setOf(Direction.NORTH, Direction.WEST) -> if (!counterClockwise && prevTile.second < currentTile.second
-                    || counterClockwise && prevTile.first < currentTile.first
-                )
-                    right(nodes, currentTile)
-                else 0
-
-                setOf(Direction.NORTH, Direction.SOUTH) -> {
-                    if (!counterClockwise == prevTile.first < currentTile.first)
-                        left(nodes, currentTile)
-                    else if (!counterClockwise == prevTile.first > currentTile.first)
-                        right(nodes, currentTile)
-                    else 0L
+            offsetNodes[(startIndex + 1) % offsetNodes.size].first > newStart.first || offsetNodes[(startIndex + 1) % offsetNodes.size].second < newStart.second
+        val area = offsetNodes.indices.map {
+            val idx = (it + startIndex) % offsetNodes.size
+            val currentTile = offsetNodes[idx]
+            val prevTile = offsetNodes[(idx + offsetNodes.size - 1) % offsetNodes.size]
+            when (currentTile.third) {
+                Direction.WEST -> {
+                    if (counterClockwise) (currentTile.second - prevTile.second) * (currentTile.first)
+                    else (currentTile.second - prevTile.second) * (currentTile.first + 1)
                 }
 
-                else -> 0L
+                Direction.EAST -> {
+                    if (counterClockwise) (currentTile.second - prevTile.second) * (currentTile.first + 1)
+                    else (currentTile.second - prevTile.second) * (currentTile.first)
+                }
+
+                Direction.SOUTH -> if (counterClockwise) (prevTile.first - currentTile.first) else 0
+                Direction.NORTH -> if (!counterClockwise) (currentTile.first - prevTile.first) else 0
+                else -> 0
             }
         }
 
-        return enclosedTiles.sum()/2 + nodes.size
+        return area.sum() + 1
     }
 
     fun part1(input: List<String>): Long {
         val instructions = input.map { it.split(" ") }.map { Instruction(charToDirection(it[0]), it[1].toLong(), it[2].trim('(',')','#')) }
-        return processInstructions(instructions)
+        return calculateEnclosedArea(instructions)
     }
 
     fun part2(input: List<String>): Long {
         val instructions = input.map { it.split(" ") }.map { Instruction(charToDirection(it[0]), it[1].toLong(), it[2].trim('(',')','#')).getTrueInstruction() }
-        return processInstructions(instructions)
+        return calculateEnclosedArea(instructions)
     }
 
     // test if implementation meets criteria from the description, like:
