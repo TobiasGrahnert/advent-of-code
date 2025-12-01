@@ -1,3 +1,8 @@
+package aoc.y2023
+
+import println
+import readInput
+
 fun main() {
     val number = """\d+""".toRegex()
     val symbol = """[^\d.\s]""".toRegex()
@@ -20,13 +25,13 @@ fun main() {
         return sum
     }
 
-    fun HashMap<Pair<Int,Int>, List<Int>>.addEntry(key: Pair<Int,Int>, value: Int) {
+    fun HashMap<Pair<Int,Int>, MutableList<Int>>.addEntry(key: Pair<Int,Int>, value: Int) {
         this.putIfAbsent(key, mutableListOf())
         this[key]?.addLast(value)
     }
 
     fun part2(input: List<String>): Int {
-        val gears = hashMapOf<Pair<Int,Int>, List<Int>>()
+        val gears = hashMapOf<Pair<Int,Int>, MutableList<Int>>()
         input.forEachIndexed { index, line ->
             for (range in number.findAll(line)) {
                 val start = (range.range.first - 1).coerceAtLeast(0)
@@ -46,11 +51,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day03_test")
+    val testInput = readInput(2023,"Day03_test")
     check(part1(testInput) == 4361)
     check(part2(testInput) == 467835)
 
-    val input = readInput("Day03")
+    val input = readInput(2023,"Day03")
     part1(input).println()
     part2(input).println()
 }

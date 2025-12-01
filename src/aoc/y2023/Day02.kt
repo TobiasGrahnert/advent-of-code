@@ -1,6 +1,9 @@
+package aoc.y2023
 
+import println
+import readInput
 data class Pull(var red: Int = 0, var green: Int = 0, var blue: Int = 0)
-data class Game(val id: Int, val pulls: List<Pull>) {
+data class Game(val id: Int, val pulls: MutableList<Pull>) {
     fun minPower(): Int {
         return pulls.maxOf { it.red } * pulls.maxOf { it.blue } * pulls.maxOf { it.green }
     }
@@ -47,10 +50,10 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day02_test")
+    val testInput = readInput(2023,"Day02_test")
     check(part1(testInput) == 8)
 
-    val input = readInput("Day02")
+    val input = readInput(2023,"Day02")
     part1(input).println()
     part2(input).println()
 }

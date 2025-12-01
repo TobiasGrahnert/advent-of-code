@@ -1,3 +1,8 @@
+package aoc.y2023
+
+import println
+import readInput
+
 fun main() {
     fun getWaysToWin(times: List<Long>, distances: List<Long>):List<Long> {
         val results = mutableListOf<Long>()
@@ -27,11 +32,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day06_test")
+    val testInput = readInput(2023,"Day06_test")
     check(part1(testInput) == 288L)
     check(part2(testInput) == 71503L)
 
-    val input = readInput("Day06")
+    val input = readInput(2023,"Day06")
     part1(input).println()
     part2(input).println()
 }

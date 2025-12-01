@@ -8,11 +8,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day01_test")
+    val testInput = readInput(2025,"Day01_test")
     check(part1(testInput) == 0)
     check(part2(testInput) == 0)
 
-    val input = readInput("Day01")
+    val input = readInput(2025,"Day01")
     part1(input).println()
     part2(input).println()
 }

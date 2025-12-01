@@ -1,3 +1,8 @@
+package aoc.y2023
+
+import println
+import readInput
+import transpose
 import kotlin.math.min
 
 fun main() {
@@ -44,11 +49,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day13_test").joinToString("\n") { it }.split("\n\n").filter { it.isNotBlank() }.map { Block(it) }
+    val testInput = readInput(2023,"Day13_test").joinToString("\n") { it }.split("\n\n").filter { it.isNotBlank() }.map { Block(it) }
     check(part1(testInput) == 405)
     check(part2(testInput) == 400)
 
-    val input = readInput("Day13").joinToString("\n") { it }.split("\n\n").filter { it.isNotBlank() }.map { Block(it) }
+    val input = readInput(2023,"Day13").joinToString("\n") { it }.split("\n\n").filter { it.isNotBlank() }.map { Block(it) }
     part1(input).println()
     part2(input).println()
 }

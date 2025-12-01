@@ -1,3 +1,7 @@
+package aoc.y2023
+
+import println
+import readInput
 fun main() {
     fun getDifferences(numbers: List<Int>): List<List<Int>> {
         val differences = mutableListOf(numbers)
@@ -31,11 +35,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day09_test")
+    val testInput = readInput(2023,"Day09_test")
     check(part1(testInput) == 114)
     check(part2(testInput) == 2)
 
-    val input = readInput("Day09")
+    val input = readInput(2023,"Day09")
     part1(input).println()
     part2(input).println()
 }

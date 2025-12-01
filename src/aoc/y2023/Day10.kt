@@ -1,3 +1,7 @@
+package aoc.y2023
+
+import println
+import readInput
 import java.security.InvalidParameterException
 
 enum class Direction {
@@ -164,14 +168,14 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput1 = readInput("Day10_test").map { it.toList() }
+    val testInput1 = readInput(2023,"Day10_test").map { it.toList() }
     check(part1(testInput1) == 8)
-    val testInput2 = readInput("Day10_test2").map { it.toList() }
+    val testInput2 = readInput(2023,"Day10_test2").map { it.toList() }
     check(part2(testInput2) == 8)
-    val testInput3 = readInput("Day10_test3").map { it.toList() }
+    val testInput3 = readInput(2023,"Day10_test3").map { it.toList() }
     check(part2(testInput3) == 10)
 
-    val input = readInput("Day10").map { it.toList() }
+    val input = readInput(2023,"Day10").map { it.toList() }
     part1(input).println()
     part2(input).println()
 }

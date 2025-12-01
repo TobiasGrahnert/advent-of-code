@@ -1,3 +1,7 @@
+package aoc.y2023
+
+import println
+import readInput
 import java.util.stream.Collectors
 
 fun main() {
@@ -57,12 +61,12 @@ fun main() {
 
 
     // test if implementation meets criteria from the description, like:
-    val testInput1 = readInput("Day01_test")
+    val testInput1 = readInput(2023,"Day01_test")
     check(part1(testInput1) == 142)
-    val testInput2 = readInput("Day01_test2")
+    val testInput2 = readInput(2023,"Day01_test2")
     check(part2(testInput2) == 281)
 
-    val input = readInput("Day01")
+    val input = readInput(2023,"Day01")
     part1(input).println()
     part2(input).println()
 }

@@ -1,3 +1,8 @@
+package aoc.y2023
+
+import println
+import readInput
+import findLCM
 fun main() {
 
     val dir = hashSetOf('L','R')
@@ -55,12 +60,12 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day08_test")
+    val testInput = readInput(2023,"Day08_test")
     check(part1(testInput) == 2)
-    val testInput2 = readInput("Day08_test2")
+    val testInput2 = readInput(2023,"Day08_test2")
     check(part2(testInput2) == 6L)
 
-    val input = readInput("Day08")
+    val input = readInput(2023,"Day08")
     part1(input).println()
     part2(input).println()
 }

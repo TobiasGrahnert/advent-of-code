@@ -1,3 +1,7 @@
+package aoc.y2023
+
+import println
+import readInput
 import kotlin.math.pow
 
 data class Card(val id: Int, val winningNumbers: Set<Int>, val numbers: Set<Int>) {
@@ -55,11 +59,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day04_test")
+    val testInput = readInput(2023,"Day04_test")
     check(part1(testInput) == 13)
     check(part2(testInput) == 30)
 
-    val input = readInput("Day04")
+    val input = readInput(2023,"Day04")
     part1(input).println()
     part2(input).println()
 }

@@ -1,3 +1,7 @@
+package aoc.y2023
+
+import println
+import readInput
 enum class WinningHand() {
     FIVE,
     FOUR,
@@ -62,11 +66,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day07_test")
+    val testInput = readInput(2023,"Day07_test")
     check(part1(testInput) == 6440)
     check(part2(testInput) == 5905)
 
-    val input = readInput("Day07")
+    val input = readInput(2023,"Day07")
     part1(input).println()
     part2(input).println()
 }

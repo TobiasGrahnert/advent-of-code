@@ -1,3 +1,8 @@
+package aoc.y2023
+
+import println
+import readInput
+import transpose
 import kotlin.math.abs
 
 fun main() {
@@ -28,12 +33,12 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day11_test")
+    val testInput = readInput(2023,"Day11_test")
     check(solve(testInput) == 374L)
     check(solve(testInput, 10) == 1030L)
     check(solve(testInput, 100) == 8410L)
 
-    val input = readInput("Day11")
+    val input = readInput(2023,"Day11")
     solve(input).println()
     solve(input, 1000000).println()
 }
