@@ -2,6 +2,7 @@ package aoc.y2025
 
 import println
 import readInput
+import kotlin.math.absoluteValue
 
 fun main() {
 
@@ -22,9 +23,9 @@ fun main() {
         return zeroCount
     }
 
+    /* original solution
     fun part2(input: List<String>): Int {
         val size = 100
-        val ring = (0..<size).toList()
         var index = 50
         var zeroCount = 0
         for (line in input) {
@@ -35,9 +36,28 @@ fun main() {
                 index += size
                 index %= size
                 steps--
-                if (ring[index] == 0) {
+                if (index == 0) {
                     zeroCount++
                 }
+            }
+        }
+        return zeroCount
+    }*/
+
+    fun part2(input: List<String>): Int {
+        val size = 100
+        var index = 50
+        var zeroCount = 0
+        for (line in input) {
+            val direction = if ('L' == line.first()) -1 else 1
+            val steps = line.drop(1).toInt()
+            zeroCount += steps / size
+            index += direction * steps
+            index %= size
+            if (index == 0
+                || direction.compareTo(0) == index.compareTo(0)
+                && steps % size > index.absoluteValue) {
+                zeroCount++
             }
         }
         return zeroCount
