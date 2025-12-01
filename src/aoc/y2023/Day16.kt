@@ -1,3 +1,8 @@
+package aoc.y2023
+
+import println
+import readInput
+
 data class Tile(val row: Int, val column: Int, val type: Char) {
     private val enteredDirections = mutableSetOf<Direction>()
 
@@ -111,11 +116,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day16_test")
+    val testInput = readInput(2023,"Day16_test")
     check(part1(testInput) == 46)
     check(part2(testInput) == 51)
 
-    val input = readInput("Day16")
+    val input = readInput(2023,"Day16")
     part1(input).println()
     part2(input).println()
 }

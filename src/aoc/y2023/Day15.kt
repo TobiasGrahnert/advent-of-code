@@ -1,3 +1,8 @@
+package aoc.y2023
+
+import println
+import readInput
+
 fun main() {
     data class Lens(val label: String, var focalLength: Int)
 
@@ -37,11 +42,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day15_test")
+    val testInput = readInput(2023,"Day15_test")
     check(part1(testInput) == 1320)
     check(part2(testInput) == 145)
 
-    val input = readInput("Day15")
+    val input = readInput(2023,"Day15")
     part1(input).println()
     part2(input).println()
 }

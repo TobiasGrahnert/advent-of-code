@@ -1,4 +1,9 @@
+package aoc.y2023
+
+import println
+import readInput
 import java.util.*
+import kotlin.collections.sum
 import kotlin.math.abs
 
 fun main() {
@@ -11,7 +16,7 @@ fun main() {
                 '0' -> Direction.EAST
                 else -> Direction.NONE
             }
-            val length = color.substring(0, color.length-1).toLong(16)
+            val length = color.dropLast(1).toLong(16)
             return Instruction(direction, length, this.color)
         }
     }
@@ -44,7 +49,9 @@ fun main() {
         val (startIndex, newStart) = offsetNodes.withIndex()
             .minWith(compareBy<IndexedValue<Triple<Long, Long, Direction>>> { it.value.first }.thenBy { it.value.second })
         val counterClockwise =
-            offsetNodes[(startIndex + 1) % offsetNodes.size].first > newStart.first || offsetNodes[(startIndex + 1) % offsetNodes.size].second < newStart.second
+            offsetNodes[(startIndex + 1) % offsetNodes.size].first.compareTo(newStart.first) == 0 || offsetNodes[(startIndex + 1) % offsetNodes.size].second.compareTo(
+                newStart.second
+            ) == 0
         val area = offsetNodes.indices.map {
             val idx = (it + startIndex) % offsetNodes.size
             val currentTile = offsetNodes[idx]
@@ -80,11 +87,11 @@ fun main() {
     }
 
     // test if implementation meets criteria from the description, like:
-    val testInput = readInput("Day18_test")
+    val testInput = readInput(2023,"Day18_test")
     check(part1(testInput) == 62L)
     check(part2(testInput) == 952408144115L)
 
-    val input = readInput("Day18")
+    val input = readInput(2023,"Day18")
     part1(input).println()
     part2(input).println()
 }
